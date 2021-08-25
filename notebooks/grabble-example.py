@@ -14,6 +14,10 @@
 # ---
 
 # %%
+%load_ext autoreload
+%autoreload 2
+
+# %%
 # import re
 # import requests
 from pathlib import Path
@@ -27,8 +31,7 @@ import deepgraph as dg
 # import matplotlib.pyplot as plt
 # import seaborn as sns
 # %matplotlib inline
-%load_ext autoreload
-%autoreload 2
+
 
 import grabble as pdg
 # from nestor.datasets import load_excavators
@@ -36,3 +39,5 @@ import grabble as pdg
 # from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 # %%
+pdg.GrabbleFrame
+
