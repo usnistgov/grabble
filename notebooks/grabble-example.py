@@ -39,5 +39,10 @@ import grabble as pdg
 # from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 # %%
-pdg.GrabbleFrame
+a = pdg.GraphEdgeArray(np.array([frozenset([1,2]), frozenset([1,3])]))
 
+# %%
+pd.Index(pdg.GraphEdgeArray.from_edgelist([(1,2),(1,3)])) == pd.Index(pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3)]))
+
+# %%
+pd.Index(pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3)]))
