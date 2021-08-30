@@ -39,10 +39,21 @@ import grabble as pdg
 # from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 # %%
-a = pdg.GraphEdgeArray(np.array([frozenset([1,2]), frozenset([1,3])]))
+arr = pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3), (1,2)])
+arr.dtype
 
 # %%
-pd.Index(pdg.GraphEdgeArray.from_edgelist([(1,2),(1,3)])) == pd.Index(pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3)]))
+pd.Index(arr) == pd.Index(pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3), (2,3)]))
 
 # %%
-pd.Index(pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3)]))
+idx = pd.Index(arr)
+idx.array
+
+# %%
+idx.has_duplicates
+
+# %%
+pd.MultiIndex.from_tuples(idx.array.as_directed)
+
+# %%
+idx.array
