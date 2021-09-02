@@ -40,7 +40,7 @@ import grabble as pdg
 
 # %%
 arr = pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3), (1,2)])
-arr.dtype
+arr
 
 # %%
 pd.Index(arr) == pd.Index(pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3), (2,3)]))
@@ -53,7 +53,10 @@ idx.array
 idx.has_duplicates
 
 # %%
+arr.as_directed
+
+# %%
 pd.MultiIndex.from_tuples(idx.array.as_directed)
 
 # %%
-idx.array
+pd.Series(arr).array

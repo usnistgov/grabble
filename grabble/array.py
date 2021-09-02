@@ -7,16 +7,25 @@ from pandas.api.extensions import (
     ExtensionScalarOpsMixin,
 )
 from typing import FrozenSet, Iterable, TypeVar, Tuple, List, Set, Union, Type
-from .base import BaseEdge, DirectedEdge, NodeContainer
+from .base import DirectedEdge, NodeContainer
 
 T = TypeVar("T")
 EdgeList = Iterable[NodeContainer]
 
 
+@register_extension_dtype
 class GraphEdgeDtype(ExtensionDtype):
-    type = BaseEdge
-    name = "graph_edges"
-    na_value = np.nan
+    @property
+    def type(self):
+        return frozenset
+
+    @property
+    def name(self) -> str:
+        return "GraphEdgeDtype"
+
+    @property
+    def na_value(self) -> object:
+        return np.nan
 
     @classmethod
     def construct_from_string(cls, s: str):
@@ -27,10 +36,19 @@ class GraphEdgeDtype(ExtensionDtype):
         return GraphEdgeArray
 
 
+@register_extension_dtype
 class DirectedEdgeDtype(ExtensionDtype):
-    type = DirectedEdge
-    name = "directed_edges"
-    na_value = np.nan
+    @property
+    def type(self):
+        return DirectedEdge
+
+    @property
+    def name(self) -> str:
+        return "DirectedEdgeDtype"
+
+    @property
+    def na_value(self) -> object:
+        return np.nan
 
     @classmethod
     def construct_from_string(cls, s: str):
@@ -41,23 +59,18 @@ class DirectedEdgeDtype(ExtensionDtype):
         return DirectedEdgeArray
 
 
-register_extension_dtype(GraphEdgeDtype)
-register_extension_dtype(DirectedEdgeDtype)
-
-
 class GraphEdgeArray(ExtensionArray, ExtensionScalarOpsMixin):
-    _dtype = GraphEdgeDtype()
-
     def __init__(self, data):
         self.data = _check_array_data(self, data)
 
     @classmethod
     def from_edgelist(cls, edges: EdgeList):
-        return _from_edgelist(cls._dtype.type, edges)
+        arr = _construct_array_vectorized(frozenset, edges)
+        return GraphEdgeArray(arr)
 
     @property
-    def dtype(self):
-        return self._dtype
+    def dtype(self) -> ExtensionDtype:
+        return GraphEdgeDtype()
 
     @property
     def as_directed(self):
@@ -70,22 +83,21 @@ GraphEdgeArray._add_comparison_ops()
 
 
 class DirectedEdgeArray(ExtensionArray, ExtensionScalarOpsMixin):
-    _dtype = DirectedEdgeDtype()
-
     def __init__(self, data):
         self.data = _check_array_data(self, data)
 
     @classmethod
     def from_edgelist(cls, edges: EdgeList):
-        return _from_edgelist(cls._dtype.type, edges)
+        arr = _construct_array_vectorized(DirectedEdge, edges)
+        return DirectedEdgeArray(arr)
 
     @property
     def as_undirected(self):
         return GraphEdgeArray.from_edgelist(self.tolist())
 
     @property
-    def dtype(self):
-        return self._dtype
+    def dtype(self) -> ExtensionDtype:
+        return DirectedEdgeDtype()
 
     # def __init__(self, data):
 
