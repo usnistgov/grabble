@@ -39,6 +39,16 @@ import grabble as pdg
 # from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 # %%
+# super(pdg.GrabbleFrame, pdg.GrabbleFrame())
+pd.DataFrame()
+
+# %%
+nodes=pd.DataFrame([1,2,3])
+edges=pd.DataFrame([5,4,3])
+
+pdg.GrabbleFrame(nodes, edges).active
+
+# %%
 arr = pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3), (1,2)])
 arr
 
