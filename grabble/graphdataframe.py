@@ -80,16 +80,33 @@ class GrabbleFrame(pd.DataFrame):
     #     return super().__new__(cls, frame)
     @property
     def _constructor(self):
-        return GrabbleFrame._internal_ctor
+        return GrabbleFrame._internal_constructor(self.__class__)
+
+    class _internal_constructor(object):
+        def __init__(self, cls):
+            self.cls = cls
+
+        def __call__(self, *args, **kwargs):
+            kwargs["nodes"] = None
+            kwargs["edges"] = None
+            kwargs["active"] = None
+            return self.cls(*args, **kwargs)
+
+        def _from_axes(self, *args, **kwargs):
+            return self.cls._from_axes(*args, **kwargs)
 
     _metadata = ["nodes", "edges", "active"]
 
-    @classmethod
-    def _internal_ctor(cls, *args, **kwargs):
-        kwargs["nodes"] = None
-        kwargs["edges"] = None
-        kwargs["active"] = None
-        return cls(*args, **kwargs)
+    # @property
+    # def _constructor(self):
+    #     return GrabbleFrame._internal_ctor
+
+    # @classmethod
+    # def _internal_ctor(cls, *args, **kwargs):
+    #     kwargs["nodes"] = None
+    #     kwargs["edges"] = None
+    #     kwargs["active"] = None
+    #     return cls(*args, **kwargs)
 
     def __init__(
         self,

@@ -46,7 +46,12 @@ pd.DataFrame()
 nodes=pd.DataFrame([1,2,3])
 edges=pd.DataFrame([5,4,3])
 
-pdg.GrabbleFrame(nodes, edges).active
+gdf = pdg.GrabbleFrame(nodes, edges)
+
+# %%
+gdf.activate('edges') 
+
+# %%
 
 # %%
 arr = pdg.GraphEdgeArray.from_edgelist([(2,1),(1,3), (1,2)])
