@@ -16,6 +16,11 @@ Grabble is also a highly _general_ way of storing and manipulating graphs: it is
 
 ## Core Idea
 
+1. Labeled Incidence (role) Tensors
+2. syncronized indices to derived objects
+
+
+
 ### Incidence Structures
 
 ### "Roles"
