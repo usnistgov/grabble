@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: hydrogen
 #       format_version: '1.3'
-#       jupytext_version: 1.11.3
+#       jupytext_version: 1.14.0
 #   kernelspec:
 #     display_name: Python [conda env:grabble]
 #     language: python
