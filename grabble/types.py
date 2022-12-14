@@ -1,69 +1,42 @@
 from attrs import frozen, evolve, field, define
+import static_frame as sf
+import numpy as np
 from bidict import frozenbidict
 from functools import cache
 from cytoolz import valmap
+import beartype.typing as bt
+from beartype.vale import IsAttr, IsEqual, IsInstance, Is
+from beartype.door import is_bearable
 
-EntityType = bt.TypeVar('EntityType', bound=bt.Hashable)
-EntityIndex: bt.TypeAlias = frozenbidict[EntityType,int]
+FlagDType = bt.TypeVar('FlagDType', bound=bt.Hashable)
+EntityKind = bt.TypeVar('EntityKind', bound=str) # should be PEP675 `LiteralString`
+EntityIndex: bt.TypeAlias = frozenbidict[FlagDType,int]
 
-@frozen 
-class Incidence:
-    """triple $(E1, E2, I), I \in E1 \cross E2$  
-    we go ahead and store these in `frozenbidict`'s to enable fast lookup of integer IDs 
-    """
-    entities: bt.Tuple[EntityIndex, EntityIndex]
-    flags: sf.Series  # should be Series[IndexHierarchy[E1, E2], int|bool]
+def IsBearable(beartype:bt.Type):
+    return Is[lambda instance: is_bearable(instance, beartype)]
+# FlagsIndexType:bt.TypeAlias = bt.Callable[s
+def FlagsIndex(t1: EntityKind, t2: EntityKind)->bt.Type[sf.IndexHierarchy]:
+    # change to __beartype_hint__ system in the future
+
+    # def __class_getitem__(cls, cross: bt.Tuple[EntityKind, EntityKind])-> bt.Any:
     
-RoleIndex: bt.TypeAlias = frozenbidict[str, Incidence]
+    return bt.Annotated[
+        sf.IndexHierarchy,
+        # object, 
+        # IsInstance[sf.SeriesHE]
+        IsAttr['name', IsEqual[(t1, t2)]]
+        & IsAttr['depth', IsEqual[2]]
+    ]
 
-
-def matrix_from_incidence(inc: Incidence)-> sprs.csc_array:
-    """detour through coo_array, using size(entity_set)x2 for shape"""
-    row_idx = inc.flags.index.values_at_depth(0)
-    col_idx = inc.flags.index.values_at_depth(1)
-    shape = tuple(len(bd) for bd in inc.entities)
-    return sprs.coo_array((ein, (row_idx, col_idx)), shape=shape).tocsc()
+def RoleFlags(t1:EntityKind, t2:EntityKind, role:str='base', flag_value_type:bt.Type=np.dtype.int64)->bt.Type[sf.SeriesHE]:
+    return bt.Annotated[
+        sf.SeriesHE,
+        IsAttr['index', IsBearable(FlagsIndex(t1,t2))]
+        &
+        IsAttr['dtypes',IsEqual[flag_value_type]]
+        &
+        IsAttr['name', IsEqual[role]
+    ]
+    
 
     
-def _wrap_incidence_as_role(inc:Incidence|RoleIndex)->RoleIndex:
-    if isinstance(inc, Incidence):
-        return frozencbidict(base=inc)
-    else: 
-        return inc 
-
-def _get_base_or_first(d, basename):
-    return d.get(basename, d[next(iter(d))])
-
-@frozen 
-class Grabble:
-    # flags: sf.Series  # Series[IndexHierarchy[E1, E2], int|bool]
-    role_flags:RoleIndex=field(converter=_wrap_incidence_as_role) 
-    # ^ Different possible roles to play in an incidence structure
-    base_name:str = 'base'  # the name of the role that we use by default
-
-    # ^ should auto-gen a default "base" if not provided
-    # entity_sets: bt.Tuple[bt.Set, bt.Set]  # O(1) membership tests, not index-construction
-    # ^ probably better as bidict to enable int/pos <--> name by default. 
-    # B: sprs.csc_array = field()
-    
-    @property
-    def flags(self)->sf.Series:
-        return _get_base_or_first(self.role_flags,self.base).flags
-    
-    @cache
-    @property
-    def roles(self)-> bt.Mapping[str, sprs.csc_array]:
-        return valmap(self.role_flags, matrix_from_incidence)
-                      
-    @property
-    def B(self)->sprs.csc_array:
-        return _get_base_or_first(self.roles, self.base)
-    
-@define
-class MultiGrabble:
-    """rank-N incidence structure, used for multiway analysis and
-    promotion of columnar types to entities with their own incidences"""
-
-# @define        
-# class Grabble:
-#
