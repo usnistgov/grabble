@@ -38,7 +38,7 @@ def _get_base_or_first(d, basename):
     return d.get(basename, d[next(iter(d))])
 
 @frozen 
-class Grabble:
+class Levi:
     # flags: sf.Series  # Series[IndexHierarchy[E1, E2], int|bool]
     role_flags:RoleIndex=field(converter=_wrap_incidence_as_role) 
     # ^ Different possible roles to play in an incidence structure
@@ -63,7 +63,7 @@ class Grabble:
         return _get_base_or_first(self.roles, self.base)
     
 @define
-class MultiGrabble:
+class Grabble:
     """rank-N incidence structure, used for multiway analysis and
     promotion of columnar types to entities with their own incidences"""
 
