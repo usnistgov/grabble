@@ -1,0 +1,62 @@
+from typing import Generator, NamedTuple, Hashable, Collection
+from functools import singledispatch  #TODO make generic parsing for Entity method, etc. 
+
+type ID = Hashable | Generator[Hashable]
+
+@singledispatch
+def make_entity[_E<:'Entity', _C<:Collection, ](ent:Type[_E], props:_C)->E_:
+    """useful for user-extension, parsing from custom objects"""
+    ...
+
+
+data Entity[_P<:Collection, _ID<:Hashable](label:_ID, props:_P=())
+type Entities[_E<:Entity] = _E$[]
+
+type
+
+
+# match data Entities[_E<:Entity](*entities:_E$[])
+
+    # def __new__(
+    #     cls:Type[Entity[_P, _ID]], 
+    #     # label: ID, 
+    #     *args,
+    #     # props:Collection,
+    #     # label:_ID|Generator[_ID]=None, 
+    # )->Entity[_P, _ID]:
+    #     match args:
+    #         case [cls() as ent]:
+    #             return ent
+    #         case [Hashable() as label, cls() as ent]:
+    #             return ent._replace(label=label)
+    #         case [object(label=label, props=_) as container]:
+    #             return makedata(cls, label, container)
+    #         case [Hashable() as lable, container `isinstance` Collection]:
+    #             return makedata(cls, label, container)
+    #         case [Hashable() as label, (*props)]:
+    #             return makedata(cls, label, props)
+    #         case [{'label': label, **props}]:
+    #             return makedata(cls, label, props)
+    #         case [(Hashable() as label, *props)]:
+    #             return makedata(cls, label, props)
+    #         case _:
+    #             return make_entity()  #TODO
+
+
+if __name__=='__main__':
+    Entity(1, (1,2,3))|>print
+    # Entity((1, 1,2,3))|>print
+
+    class Fake(NamedTuple):
+        name: str
+        job: str
+    
+    ent = Entity('ent1', Fake('rob', 'fixer')) 
+
+    data FakeEntity(label: int, props:Fake) from Entity[int,Fake]
+
+    FakeEntity(1, Fake('abc', 'blah'))|> print
+    ent |> print
+    # Entity[FakeEntity]('ent1', ('rob', 'fixer')) |> print
+    # # ent `isinstance` NamedTuple |> print
+    # # FakeEntity('rob', 'fixer') `isinstance` NamedTuple |> print
