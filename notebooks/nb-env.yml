@@ -14,5 +14,8 @@ dependencies:
   - python-graphblas
   - matplotlib
   - networkx
+  - tqdm
+  # - pip
   - pip:
     - phantom-types
+    - hypernetx
