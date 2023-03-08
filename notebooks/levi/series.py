@@ -4,7 +4,7 @@ from pandas import DataFrame
 import numpy as np
 from scipy import sparse
 
-@pd.api.extensions.register_dataframe_accessor("levi")   #can also be df, series, or index
+@pd.api.extensions.register_series_accessor("levi")   #can also be df, series, or index
 class LeviAccessor:
     def __init__(self, pandas_obj):
         self._validate(pandas_obj)
@@ -13,14 +13,13 @@ class LeviAccessor:
     @staticmethod
     def _validate(obj):
         # TODO: use beartype
-        if type(obj) is not pd.DataFrame:
-            raise AttributeError("Must be Levi Graph Representation")  #FIXME this is just filler to get accessor to run, need to update
+        if type(obj) is not pd.Series:
+            raise AttributeError("Must be Levi Graph Representation in MultiIndex Pandas Series format")  #FIXME this is just filler to get accessor to run, need to update
         
 
-    @property
     def to_edgelist(self, level_0="level_0", level_1="level_1"):
-        # TODO
-        return self.reset_index().rename(columns={"level_0": level_0, "level_1": level_1})
+        edgelist_df = self._obj.reset_index().rename(columns={"level_0": level_0, "level_1": level_1})
+        return edgelist_df
     
     @property
     def to_adjacency(self):
