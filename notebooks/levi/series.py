@@ -4,6 +4,8 @@ from pandas import DataFrame
 import numpy as np
 from scipy import sparse
 
+#TODO : use pandas categorical
+
 @pd.api.extensions.register_series_accessor("levi")   #can also be df, series, or index
 class LeviAccessor:
     def __init__(self, pandas_obj):
@@ -18,6 +20,7 @@ class LeviAccessor:
         
 
     def to_edgelist(self, level_0="level_0", level_1="level_1"):
+        # TODO: able to rename "flag" column
         edgelist_df = self._obj.reset_index().rename(columns={"level_0": level_0, "level_1": level_1})
         return edgelist_df
     
