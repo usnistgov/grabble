@@ -22,9 +22,15 @@ class LeviAccessor:
         return edgelist_df
     
     @property
-    def to_adjacency(self):
-        # TODO
-        return self
+    def to_adjacency(self, level_0="level_0", level_1="level_1"):
+        # similar to nx.from_pandas_edgelist()
+        # TODO: handle different names for level_0, level_1
+        df = self._obj.to_frame().reset_index()
+        A = pd.crosstab(df.level_0, df.level_1)
+        df2 = A.T @ A
+        np.fill_diagonal(df2.values, 0)
+        df2.index.name = None
+        return df2
     
     @property
     def to_biadjacency(self):
