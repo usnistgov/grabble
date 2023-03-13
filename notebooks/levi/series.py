@@ -4,7 +4,11 @@ from pandas import DataFrame
 import numpy as np
 from scipy import sparse
 
-#TODO : use pandas categorical
+from beartype import beartype
+from beartype.vale import IsAttr, IsEqual, IsSubclass, IsInstance
+from typing import Annotated  
+
+#TODO : use pandas categorical: https://github.com/pandas-dev/pandas/issues/50996
 
 @pd.api.extensions.register_series_accessor("levi")   #can also be df, series, or index
 class LeviAccessor:
@@ -12,20 +16,27 @@ class LeviAccessor:
         self._validate(pandas_obj)
         self._obj = pandas_obj
 
+    series_2Dindex = Annotated[pd.Series, # need this Series?
+        IsInstance[pd.Series] &
+        IsAttr['index', IsInstance[pd.MultiIndex]]
+    ]
+
     @staticmethod
-    def _validate(obj):
+    @beartype
+    def _validate(obj: series_2Dindex):
+        print("*** TEST ***")
         # TODO: use beartype
-        if type(obj) is not pd.Series:
-            raise AttributeError("Must be Levi Graph Representation in MultiIndex Pandas Series format")  #FIXME this is just filler to get accessor to run, need to update
+        # if type(obj) is not pd.Series:
+        #     raise AttributeError("Must be Levi Graph Representation in MultiIndex Pandas Series format")  #FIXME this is just filler to get accessor to run, need to update
         
 
-    def to_edgelist(self, level_0="level_0", level_1="level_1"):
+    def to_edgelist(self, level_0: str = "level_0", level_1: str = "level_1") -> DataFrame:
         # TODO: able to rename "flag" column
         edgelist_df = self._obj.reset_index().rename(columns={"level_0": level_0, "level_1": level_1})
         return edgelist_df
     
     @property
-    def to_adjacency(self, level_0="level_0", level_1="level_1"):
+    def to_adjacency(self, level_0: str = "level_0", level_1: str = "level_1") -> DataFrame:
         # similar to nx.from_pandas_edgelist()
         # TODO: handle different names for level_0, level_1
         df = self._obj.to_frame().reset_index()
@@ -36,7 +47,7 @@ class LeviAccessor:
         return df2
     
     @property
-    def to_biadjacency(self):
+    def to_biadjacency(self) -> DataFrame:
         # FIXME: accommodate full set of possible nodes, even in not in dataset. Fix extra index in columns: "flag"
         return self._obj.unstack(level=1, fill_value=0)
     
@@ -44,32 +55,30 @@ class LeviAccessor:
     # Reevaluate the following methods? They are taking other input and not really accessors of original levi graph
     # For now, copied in relevant code from SURF repo, to be adapted
 
-    def biadjacency_to_edgelist(self, biadjacency, value_name='weight'):
+    def biadjacency_to_edgelist(self, biadjacency: DataFrame, value_name: str = 'weight') -> DataFrame:
         # TODO
         # return (biadjacency.melt(ignore_index=False, value_name=value_name)
         #   .reset_index().astype(dict(((i.name), (i.dtype)) for i in (biadjacency.index, biadjacency.columns))))
         return self
     
-    def edgelist_to_biadjacency(self, edgelist, source_name, target_name, value_name='weight'):
+    def edgelist_to_biadjacency(self, edgelist: DataFrame, source_name: str, target_name: str, value_name: str = 'weight') -> DataFrame:
         # TODO
         #return (edgelist.pivot(index=source_name, columns=target_name, values=value_name)
         #   .reindex(columns=edgelist[target_name].unique(), index=edgelist[source_name].unique()).astype(float).fillna(0))
         return self
 
-    def edgelist_to_incidence(self, edgelist, node_colname, value_colname=None):
+    def edgelist_to_incidence(self, edgelist: DataFrame, node_colname: str, value_colname: str = None) -> DataFrame:
         #TODO
         # """assume edgelist is indexed by edge number, not some edge set of names (for now)"""
         # data = np.ones_like(edgelist.index.values) if value_colname == None else edgelist[value_colname].values
         # return sparse.coo_array((data, (edgelist.index, edgelist[node_colname].cat.codes)), shape=(edgelist.shape[0], len(edgelist[node_colname].cat.categories))) 
         return self
     
-    def edgelist_to_bipartite(self, edgelist):
+    def edgelist_to_bipartite(self, edgelis: DataFrame):
         # TODO - similar to edge_to_bp in SURF code, but want pandas format output, not networkx graph
         return self
 
 
-    
-    
     
     
     
