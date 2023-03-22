@@ -24,7 +24,7 @@ class LeviAccessor:
     @staticmethod
     @beartype
     def _validate(obj: series_2Dindex):
-        print("*** TEST ***")
+        print("*** test validator***")
         # TODO: use beartype
         # if type(obj) is not pd.Series:
         #     raise AttributeError("Must be Levi Graph Representation in MultiIndex Pandas Series format")  #FIXME this is just filler to get accessor to run, need to update
@@ -52,31 +52,32 @@ class LeviAccessor:
         return self._obj.unstack(level=1, fill_value=0)
     
 
-    # Reevaluate the following methods? They are taking other input and not really accessors of original levi graph
-    # For now, copied in relevant code from SURF repo, to be adapted
+    # Reevaluate the flocation of the following methods
+    # They should all use Levi series as intermediate step, want to keep catagoricals preserved
+    # Commented code is from SURF matchibng code, can be used as starting point
 
-    def biadjacency_to_edgelist(self, biadjacency: DataFrame, value_name: str = 'weight') -> DataFrame:
-        # TODO
-        # return (biadjacency.melt(ignore_index=False, value_name=value_name)
-        #   .reset_index().astype(dict(((i.name), (i.dtype)) for i in (biadjacency.index, biadjacency.columns))))
-        return self
+    # def biadjacency_to_edgelist(self, biadjacency: DataFrame, value_name: str = 'weight') -> DataFrame:
+    #     # TODO
+    #     # return (biadjacency.melt(ignore_index=False, value_name=value_name)
+    #     #   .reset_index().astype(dict(((i.name), (i.dtype)) for i in (biadjacency.index, biadjacency.columns))))
+    #     return self
     
-    def edgelist_to_biadjacency(self, edgelist: DataFrame, source_name: str, target_name: str, value_name: str = 'weight') -> DataFrame:
-        # TODO
-        #return (edgelist.pivot(index=source_name, columns=target_name, values=value_name)
-        #   .reindex(columns=edgelist[target_name].unique(), index=edgelist[source_name].unique()).astype(float).fillna(0))
-        return self
+    # def edgelist_to_biadjacency(self, edgelist: DataFrame, source_name: str, target_name: str, value_name: str = 'weight') -> DataFrame:
+    #     # TODO
+    #     #return (edgelist.pivot(index=source_name, columns=target_name, values=value_name)
+    #     #   .reindex(columns=edgelist[target_name].unique(), index=edgelist[source_name].unique()).astype(float).fillna(0))
+    #     return self
 
-    def edgelist_to_incidence(self, edgelist: DataFrame, node_colname: str, value_colname: str = None) -> DataFrame:
-        #TODO
-        # """assume edgelist is indexed by edge number, not some edge set of names (for now)"""
-        # data = np.ones_like(edgelist.index.values) if value_colname == None else edgelist[value_colname].values
-        # return sparse.coo_array((data, (edgelist.index, edgelist[node_colname].cat.codes)), shape=(edgelist.shape[0], len(edgelist[node_colname].cat.categories))) 
-        return self
+    # def edgelist_to_incidence(self, edgelist: DataFrame, node_colname: str, value_colname: str = None) -> DataFrame:
+    #     #TODO
+    #     # """assume edgelist is indexed by edge number, not some edge set of names (for now)"""
+    #     # data = np.ones_like(edgelist.index.values) if value_colname == None else edgelist[value_colname].values
+    #     # return sparse.coo_array((data, (edgelist.index, edgelist[node_colname].cat.codes)), shape=(edgelist.shape[0], len(edgelist[node_colname].cat.categories))) 
+    #     return self
     
-    def edgelist_to_bipartite(self, edgelis: DataFrame):
-        # TODO - similar to edge_to_bp in SURF code, but want pandas format output, not networkx graph
-        return self
+    # def edgelist_to_bipartite(self, edgelis: DataFrame):
+    #     # TODO - similar to edge_to_bp in SURF code, but want pandas format output, not networkx graph
+    #     return self
 
 
     
