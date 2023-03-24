@@ -16,7 +16,7 @@ class LeviAccessor:
         self._validate(pandas_obj)
         self._obj = pandas_obj
 
-    series_2Dindex = Annotated[pd.Series, # need this Series?
+    series_2Dindex = Annotated[pd.Series, # need this pd.Series?
         IsInstance[pd.Series] &
         IsAttr['index', IsInstance[pd.MultiIndex]]
     ]
