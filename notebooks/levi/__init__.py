@@ -9,5 +9,6 @@ logging.getLogger(__name__).addHandler(NullHandler())
 
 from .dataframe import LeviAccessor
 
-from tqdm.autonotebook import tqdm
+# from tqdm.autonotebook import tqdm
+from tqdm.auto import tqdm
 tqdm.pandas()

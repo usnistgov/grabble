@@ -37,12 +37,10 @@ class LeviAccessor:
             columns={"level_0": level_0, "level_1": level_1})
         return edgelist_df
 
-    @property
     def to_adjacency(self, level_0: str = "level_0", level_1: str = "level_1") -> DataFrame:
         # similar to nx.from_pandas_edgelist()
-        # TODO: handle different names for level_0, level_1
         df = self._obj.to_frame().reset_index()
-        A = pd.crosstab(df.level_0, df.level_1)
+        A = pd.crosstab(df[level_0], df[level_1])
         df2 = A.T @ A
         np.fill_diagonal(df2.values, 0)
         df2.index.name = None
@@ -54,16 +52,15 @@ class LeviAccessor:
         return self._obj.unstack(level=1, fill_value=0)
 
     @property
-    def to_new_levi(old_levi, level_0='level_0',  level_1='level_1'):
-        el = old_levi.to_edgelist()
+    def to_new_levi(self, level_0='level_0',  level_1='level_1'):
+        el = self._obj.levi.to_edgelist()
         new_levi_el = (pd.concat([el[[level_0, "flag"]], el[[level_1, "flag"]]])
                        .reset_index()
                        .rename(columns={level_1: level_0})
                        .stack()
                        .unstack()
                        )
-        new_levi = pd.Series(new_levi_el.flag)
-        new_levi.index = (pd.MultiIndex.from_arrays(new_levi_el.values.T))
+        new_levi = new_levi_el.set_index(["index", "level_0"]).squeeze()
         return new_levi
 
     # Reevaluate the flocation of the following methods

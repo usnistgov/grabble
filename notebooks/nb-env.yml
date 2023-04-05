@@ -8,6 +8,7 @@ dependencies:
   - python=3.10
   - numpy
   - pandas
+  - ipykernel
   - deepgraph
   - beartype
   - static-frame
@@ -15,7 +16,9 @@ dependencies:
   - matplotlib
   - networkx
   - tqdm
-  # - pip
+  - pandas-flavor
+  - pip
   - pip:
     - phantom-types
     - hypernetx
+    - plum-dispatch

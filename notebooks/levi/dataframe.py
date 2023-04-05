@@ -4,6 +4,8 @@ from pandas import DataFrame
 import numpy as np
 from scipy import sparse
 
+from levi import series
+
 #TODO : use pandas categorical: https://github.com/pandas-dev/pandas/issues/50996
 
 @pd.api.extensions.register_dataframe_accessor("levi")   #can also be df, series, or index
@@ -17,25 +19,35 @@ class LeviAccessor:
         # TODO: use beartype
         if type(obj) is not pd.DataFrame:
             raise AttributeError("Must be Levi Graph Representation")  #FIXME this is just filler to get accessor to run, need to update
+
+    # To Levi
+
+    def edgelist_to_levi(self):
+        # TODO
+        # levi to edgelist
+        # edgelist_df = self._obj.reset_index().rename(
+        #     columns={"level_0": level_0, "level_1": level_1})
+        
+        return self   
+        
+    def adjacency_to_levi(self):
+        # TODO
+        return self     
+
+    def biadjacency_to_levi(self):
+        # TODO: fix set_index keys
+        levi = self._obj.melt(ignore_index=False).reset_index().set_index(['index', 'variable']).squeeze()
+        return levi         
         
 
-    # @property
-    # def to_edgelist(self, level_0="level_0", level_1="level_1"):
-    #     # TODO
-    #     return self.reset_index().rename(columns={"level_0": level_0, "level_1": level_1})
-    
-    # @property
-    # def to_adjacency(self):
-    #     # TODO
-    #     return self
-    
-    # @property
-    # def to_biadjacency(self):
-    #     # FIXME: accommodate full set of possible nodes, even in not in dataset. Fix extra index in columns: "flag"
-    #     return self._obj.unstack(level=1, fill_value=0)
-    
+    # Between formats
 
-    
+    def adjacency_to_edgelist(self):  #FIXME: this makes adjacency matrix??
+        adj = self._obj
+        levi = (adj@adj.T) #.melt(ignore_index)
+
+        return levi
+        
     # For now, copied in relevant code from SURF repo, to be adapted
 
     def biadjacency_to_edgelist(self, biadjacency, value_name='weight'):
