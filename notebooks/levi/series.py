@@ -32,16 +32,16 @@ class LeviAccessor:
         #     raise AttributeError("Must be Levi Graph Representation in MultiIndex Pandas Series format")  #FIXME this is just filler to get accessor to run, need to update
 
     def to_edgelist(self, level_0: str = "level_0", level_1: str = "level_1") -> DataFrame:
-        # TODO: able to rename "flag" column
-        edgelist_df = self._obj.reset_index().rename(
-            columns={"level_0": level_0, "level_1": level_1})
+        adj = self._obj.levi.to_adjacency()
+        edgelist_df = adj.unstack().reset_index().rename(
+            columns={"level_0": level_0, "level_1": level_1, "0": "weight"})
         return edgelist_df
 
     def to_adjacency(self, level_0: str = "level_0", level_1: str = "level_1") -> DataFrame:
         # similar to nx.from_pandas_edgelist()
         df = self._obj.to_frame().reset_index()
         A = pd.crosstab(df[level_0], df[level_1])
-        df2 = A.T @ A
+        df2 = A.T @ A  #TODO: handle different types of functions  levi.project(on: level_0, function: Callable[leviSeries, df], dot_product)
         np.fill_diagonal(df2.values, 0)
         df2.index.name = None
         return df2
@@ -62,30 +62,3 @@ class LeviAccessor:
                        )
         new_levi = new_levi_el.set_index(["index", "level_0"]).squeeze()
         return new_levi
-
-    # Reevaluate the flocation of the following methods
-    # They should all use Levi series as intermediate step, want to keep catagoricals preserved
-    # Commented code is from SURF matchibng code, can be used as starting point
-
-    # def biadjacency_to_edgelist(self, biadjacency: DataFrame, value_name: str = 'weight') -> DataFrame:
-    #     # TODO
-    #     # return (biadjacency.melt(ignore_index=False, value_name=value_name)
-    #     #   .reset_index().astype(dict(((i.name), (i.dtype)) for i in (biadjacency.index, biadjacency.columns))))
-    #     return self
-
-    # def edgelist_to_biadjacency(self, edgelist: DataFrame, source_name: str, target_name: str, value_name: str = 'weight') -> DataFrame:
-    #     # TODO
-    #     #return (edgelist.pivot(index=source_name, columns=target_name, values=value_name)
-    #     #   .reindex(columns=edgelist[target_name].unique(), index=edgelist[source_name].unique()).astype(float).fillna(0))
-    #     return self
-
-    # def edgelist_to_incidence(self, edgelist: DataFrame, node_colname: str, value_colname: str = None) -> DataFrame:
-    #     #TODO
-    #     # """assume edgelist is indexed by edge number, not some edge set of names (for now)"""
-    #     # data = np.ones_like(edgelist.index.values) if value_colname == None else edgelist[value_colname].values
-    #     # return sparse.coo_array((data, (edgelist.index, edgelist[node_colname].cat.codes)), shape=(edgelist.shape[0], len(edgelist[node_colname].cat.categories)))
-    #     return self
-
-    # def edgelist_to_bipartite(self, edgelis: DataFrame):
-    #     # TODO - similar to edge_to_bp in SURF code, but want pandas format output, not networkx graph
-    #     return self
