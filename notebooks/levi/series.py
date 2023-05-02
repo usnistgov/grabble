@@ -34,13 +34,15 @@ class LeviAccessor:
     def to_edgelist(self, level_0: str = "level_0", level_1: str = "level_1") -> DataFrame:
         adj = self._obj.levi.to_adjacency()
         edgelist_df = adj.unstack().reset_index().rename(
-            columns={"level_0": level_0, "level_1": level_1, "0": "weight"})
+            columns={"level_0": level_0, "level_1": level_1, "0": "weight"}) 
+            # .astype({i.name:i.dtype for i in (affinity.index,affinity.columns)})
+            # TODO: use melt.reset_index like in SURF code?
         return edgelist_df
 
     def to_adjacency(self, level_0: str = "level_0", level_1: str = "level_1") -> DataFrame:
         # similar to nx.from_pandas_edgelist()
         df = self._obj.to_frame().reset_index()
-        A = pd.crosstab(df[level_0], df[level_1])
+        A = pd.crosstab(df.iloc[:, 0], df.iloc[:, 1])
         df2 = A.T @ A  #TODO: handle different types of functions  levi.project(on: level_0, function: Callable[leviSeries, df], dot_product)
         np.fill_diagonal(df2.values, 0)
         df2.index.name = None
@@ -51,9 +53,9 @@ class LeviAccessor:
         # FIXME: accommodate full set of possible nodes, even in not in dataset. Fix extra index in columns: "flag"
         return self._obj.unstack(level=1, fill_value=0)
 
-    @property
-    def to_new_levi(self, level_0='level_0',  level_1='level_1'):
-        el = self._obj.levi.to_edgelist()
+    def to_new_levi(self, level_0="level_0",  level_1="level_1"):
+        el = self._obj.reset_index().rename(
+            columns={"level_0": level_0, "level_1": level_1})
         new_levi_el = (pd.concat([el[[level_0, "flag"]], el[[level_1, "flag"]]])
                        .reset_index()
                        .rename(columns={level_1: level_0})
