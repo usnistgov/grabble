@@ -10,23 +10,21 @@ from typing import Annotated
 
 # TODO : use pandas categorical: https://github.com/pandas-dev/pandas/issues/50996
 
-
-# can also be df, series, or index
 @pd.api.extensions.register_series_accessor("levi")
 class LeviAccessor:
     def __init__(self, pandas_obj):
         self._validate(pandas_obj)
         self._obj = pandas_obj
 
-    series_2Dindex = Annotated[pd.Series,  # need this pd.Series?
+    levi_series = Annotated[pd.Series, 
                                IsInstance[pd.Series] &
                                IsAttr['index', IsInstance[pd.MultiIndex]]
                                ]
 
     @staticmethod
     @beartype
-    def _validate(obj: series_2Dindex):
-        print("*** test validator***")
+    def _validate(obj: levi_series):
+        print("*** test validator***") 
         # TODO: use beartype
         # if type(obj) is not pd.Series:
         #     raise AttributeError("Must be Levi Graph Representation in MultiIndex Pandas Series format")  #FIXME this is just filler to get accessor to run, need to update
@@ -48,15 +46,15 @@ class LeviAccessor:
         df2.index.name = None
         return df2
 
-    @property
     def to_biadjacency(self) -> DataFrame:
-        # FIXME: accommodate full set of possible nodes, even in not in dataset. Fix extra index in columns: "flag"
-        return self._obj.unstack(level=1, fill_value=0)
+        # FIXME: accommodate full set of possible nodes, even in not in dataset. 
+        return self._obj.unstack(level=1, fill_value=0).rename_axis(None, index=0).rename_axis(None, axis=1)
 
     def to_new_levi(self, level_0="level_0",  level_1="level_1"):
-        el = self._obj.reset_index().rename(
-            columns={"level_0": level_0, "level_1": level_1})
-        new_levi_el = (pd.concat([el[[level_0, "flag"]], el[[level_1, "flag"]]])
+        self._obj.index.names = [None, None]
+        levi_df = self._obj.reset_index() #.rename(
+            #columns={"level_0": level_0, "level_1": level_1})
+        new_levi_el = (pd.concat([levi_df[[level_0, "flag"]], levi_df[[level_1, "flag"]]])
                        .reset_index()
                        .rename(columns={level_1: level_0})
                        .stack()

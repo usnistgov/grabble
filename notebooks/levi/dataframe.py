@@ -23,16 +23,13 @@ class LeviAccessor:
     # To Levi
 
     def edgelist_to_levi(self):
-        # TODO
-        # levi to edgelist
-        # edgelist_df = self._obj.reset_index().rename(
-        #     columns={"level_0": level_0, "level_1": level_1})
-        
-        return self   
-        
+        edgelist_df = self._obj.set_index(self._obj.columns[0:2].tolist()).squeeze()
+        return edgelist_df
+
     def adjacency_to_levi(self):
-        # TODO
-        return self     
+        # FIXME
+           levi = self._obj.melt(ignore_index=False).squeeze()
+           return levi    
 
     def biadjacency_to_levi(self):
         # TODO: fix set_index keys
