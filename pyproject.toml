@@ -2,7 +2,7 @@
 name = "grabble"
 version = "0.1.0"
 description = ""
-authors = ["Thurston Sexton <thurston.sexton@nist.gov>"]
+authors = ["Rachael Sexton <rtbs@nist.gov>"]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
