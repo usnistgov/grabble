@@ -1,5 +1,18 @@
+# create it: `conda env create -f nb-env.yml`
+# update it: `conda env update -f nb-env.yml`
+
 name: grabble
 channels:
   - conda-forge
 dependencies:
   - python=3.10
+  - numpy
+  - pandas
+  - deepgraph
+  - beartype
+  - static-frame
+  - python-graphblas
+  - matplotlib
+  - networkx
+  - pip:
+    - phantom-types
