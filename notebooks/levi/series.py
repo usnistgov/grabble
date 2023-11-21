@@ -54,11 +54,11 @@ class LeviAccessor:
         self._obj.index.names = [None, None]
         levi_df = self._obj.reset_index() #.rename(
             #columns={"level_0": level_0, "level_1": level_1})
-        new_levi_el = (pd.concat([levi_df[[level_0, "flag"]], levi_df[[level_1, "flag"]]])
+        new_levi_df = (pd.concat([levi_df[[level_0, "flag"]], levi_df[[level_1, "flag"]]])
                        .reset_index()
                        .rename(columns={level_1: level_0})
                        .stack()
                        .unstack()
                        )
-        new_levi = new_levi_el.set_index(["index", "level_0"]).squeeze()
+        new_levi = new_levi_df.set_index(["index", "level_0"]).squeeze()
         return new_levi
