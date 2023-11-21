@@ -47,7 +47,7 @@ class LeviAccessor:
         return df2
 
     def to_biadjacency(self) -> DataFrame:
-        # FIXME: accommodate full set of possible nodes, even in not in dataset. 
+        # FIXME: accommodate full set of possible nodes, even if not in dataset. 
         return self._obj.unstack(level=1, fill_value=0).rename_axis(None, index=0).rename_axis(None, axis=1)
 
     def to_new_levi(self, level_0="level_0",  level_1="level_1"):
