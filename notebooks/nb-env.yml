@@ -17,6 +17,7 @@ dependencies:
   - networkx
   - tqdm
   - pandas-flavor
+  - pandera
   - pip
   - pip:
     - phantom-types
